@@ -18,6 +18,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+        System.out.println("errorStackTrace >>> ");
+        exception.printStackTrace();
+
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
         return ResponseEntity

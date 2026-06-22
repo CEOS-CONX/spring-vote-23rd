@@ -1,11 +1,16 @@
 package com.ceos23.spring_boot.vote.controller;
 
+import com.ceos23.spring_boot.auth.dto.LoginRequest;
+import com.ceos23.spring_boot.auth.dto.SignupRequest;
 import com.ceos23.spring_boot.poll.domain.Candidate;
 import com.ceos23.spring_boot.poll.domain.Poll;
 import com.ceos23.spring_boot.poll.repository.CandidateRepository;
 import com.ceos23.spring_boot.poll.repository.PollRepository;
+import com.ceos23.spring_boot.user.domain.Part;
+import com.ceos23.spring_boot.user.domain.Team;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class VoteApiTest {
 
     @Autowired
@@ -43,9 +51,35 @@ class VoteApiTest {
         pollRepository.deleteAll();
     }
 
+    @PostConstruct
+    @Transactional
+    void signup() throws Exception {
+        SignupRequest signupRequest = new SignupRequest(
+                "ceos1234", "ceos1234**", "contact.conx@gmail.com", Part.BACKEND, "홍길동", Team.CONX
+        );
+
+        mockMvc.perform(post("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signupRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Transactional
+    String login() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("ceos1234", "ceos1234**");
+
+        return mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andReturn().getResponse().getHeader("Authorization");
+    }
+
     @Test
     @DisplayName("투표를 만들 수 있다")
     void createPoll() throws Exception {
+        String token = login();
+
         String request = """
                 {
                   "title": "23기 데모데이 투표",
@@ -71,6 +105,7 @@ class VoteApiTest {
                 """;
 
         mockMvc.perform(post("/api/v1/polls")
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk())
@@ -84,6 +119,7 @@ class VoteApiTest {
     @Test
     @DisplayName("후보에게 투표하면 득표 수가 증가한다")
     void vote() throws Exception {
+        String token = login();
         Long pollId = createDemoDayPoll();
 
         Candidate diggIndie = findCandidateByName(pollId, "DiggIndie");
@@ -95,6 +131,7 @@ class VoteApiTest {
                 """.formatted(diggIndie.getId());
 
         mockMvc.perform(post("/api/v1/polls/{pollId}/votes", pollId)
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(voteRequest))
                 .andExpect(status().isOk())
@@ -141,13 +178,15 @@ class VoteApiTest {
         mockMvc.perform(get("/api/v1/polls/{pollId}/results", 999L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.code").value("POLL_NOT_FOUND"))
+                .andExpect(jsonPath("$.code").value("E005"))
                 .andExpect(jsonPath("$.message").value("투표를 찾을 수 없습니다."));
     }
 
     @Test
     @DisplayName("해당 투표에 속하지 않은 후보에게 투표하면 예외가 발생한다")
     void voteCandidateNotInPoll() throws Exception {
+        String token = login();
+
         Long pollId = createDemoDayPoll();
         Long anotherPollId = createPartLeaderPoll();
 
@@ -160,15 +199,17 @@ class VoteApiTest {
                 """.formatted(backendCandidate.getId());
 
         mockMvc.perform(post("/api/v1/polls/{pollId}/votes", pollId)
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(voteRequest))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.code").value("CANDIDATE_NOT_IN_POLL"))
+                .andExpect(jsonPath("$.code").value("E007"))
                 .andExpect(jsonPath("$.message").value("해당 투표에 속한 후보가 아닙니다."));
     }
 
     private Long createDemoDayPoll() throws Exception {
+        String token = login();
         String request = """
                 {
                   "title": "23기 데모데이 투표",
@@ -194,6 +235,7 @@ class VoteApiTest {
                 """;
 
         String response = mockMvc.perform(post("/api/v1/polls")
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk())
@@ -207,6 +249,7 @@ class VoteApiTest {
     }
 
     private Long createPartLeaderPoll() throws Exception {
+        String token = login();
         String request = """
                 {
                   "title": "23기 백엔드 파트장 투표",
@@ -227,6 +270,7 @@ class VoteApiTest {
                 """;
 
         String response = mockMvc.perform(post("/api/v1/polls")
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk())
@@ -252,6 +296,7 @@ class VoteApiTest {
     }
 
     private void vote(Long pollId, Long candidateId) throws Exception {
+        String token = login();
         String request = """
                 {
                   "candidateId": %d
@@ -259,6 +304,7 @@ class VoteApiTest {
                 """.formatted(candidateId);
 
         mockMvc.perform(post("/api/v1/polls/{pollId}/votes", pollId)
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk());
