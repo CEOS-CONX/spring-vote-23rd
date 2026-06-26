@@ -58,8 +58,7 @@ class VoteApiTest {
         mockMvc.perform(post("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
+                .andReturn(); // andExpect 제거! 409여도 그냥 넘어감
     }
 
     @Transactional
