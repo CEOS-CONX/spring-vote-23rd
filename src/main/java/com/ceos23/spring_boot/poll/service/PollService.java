@@ -10,6 +10,7 @@ import com.ceos23.spring_boot.poll.dto.PollCreateResponse;
 import com.ceos23.spring_boot.poll.dto.PollResultResponse;
 import com.ceos23.spring_boot.poll.repository.CandidateRepository;
 import com.ceos23.spring_boot.poll.repository.PollRepository;
+import com.ceos23.spring_boot.poll.dto.PollListResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,13 @@ public class PollService {
     public PollService(PollRepository pollRepository, CandidateRepository candidateRepository) {
         this.pollRepository = pollRepository;
         this.candidateRepository = candidateRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PollListResponse> getPolls() {
+        return pollRepository.findAllByOrderByIdAsc().stream()
+                .map(PollListResponse::from)
+                .toList();
     }
 
     @Transactional

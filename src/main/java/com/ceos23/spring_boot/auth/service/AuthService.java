@@ -74,6 +74,12 @@ public class AuthService {
                 TimeUnit.SECONDS
         );
 
-        return LoginResponse.of(accessToken, refreshToken);
+        return LoginResponse.of(
+                accessToken,
+                refreshToken,
+                member.getUsername(),
+                member.getPart().name(),
+                member.getTeam().name()
+        );
     }
 }

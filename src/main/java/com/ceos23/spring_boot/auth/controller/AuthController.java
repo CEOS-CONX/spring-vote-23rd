@@ -34,11 +34,11 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "아이디와 비밀번호로 로그인합니다.")
     @PostMapping("/login")
-    public ApiResponse<?> login(@RequestBody LoginRequest request,
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request,
                                             HttpServletResponse res) {
         LoginResponse response = authService.login(request);
         tokenProvider.setToken(response.accessToken(), response.refreshToken(), res);
 
-        return ApiResponse.ok("로그인 성공");
+        return ApiResponse.ok("로그인 성공", response);
     }
 }
