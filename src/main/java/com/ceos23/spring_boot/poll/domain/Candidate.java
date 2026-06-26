@@ -1,7 +1,7 @@
 package com.ceos23.spring_boot.poll.domain;
 
 import com.ceos23.spring_boot.global.domain.BaseEntity;
-import com.ceos23.spring_boot.global.type.Part;
+import com.ceos23.spring_boot.user.domain.Part;
 import com.ceos23.spring_boot.user.domain.Team;
 import jakarta.persistence.*;
 import lombok.Getter;

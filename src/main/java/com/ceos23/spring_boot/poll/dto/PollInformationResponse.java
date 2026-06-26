@@ -5,7 +5,7 @@ import com.ceos23.spring_boot.poll.domain.Poll;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "투표 생성 응답")
-public class PollCreateResponse {
+public class PollInformationResponse {
 
     @Schema(description = "투표 ID", example = "1")
     private final Long pollId;
@@ -16,14 +16,14 @@ public class PollCreateResponse {
     @Schema(description = "투표 유형", example = "DEMO_DAY")
     private final VoteType voteType;
 
-    private PollCreateResponse(Long pollId, String title, VoteType voteType) {
+    private PollInformationResponse(Long pollId, String title, VoteType voteType) {
         this.pollId = pollId;
         this.title = title;
         this.voteType = voteType;
     }
 
-    public static PollCreateResponse from(Poll poll) {
-        return new PollCreateResponse(
+    public static PollInformationResponse from(Poll poll) {
+        return new PollInformationResponse(
                 poll.getId(),
                 poll.getTitle(),
                 poll.getVoteType()
