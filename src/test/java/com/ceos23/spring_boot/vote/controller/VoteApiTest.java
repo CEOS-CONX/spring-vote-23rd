@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,6 +57,7 @@ class VoteApiTest {
     private RedisTemplate<Object, Object> redisTemplate;
 
     @Test
+    @Transactional
     @DisplayName("투표를 만들 수 있다")
     void createPoll() throws Exception {
         String token = login();
@@ -97,6 +99,7 @@ class VoteApiTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("후보에게 투표하면 득표 수가 증가한다")
     void vote() throws Exception {
         String token = login();
@@ -122,6 +125,7 @@ class VoteApiTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("투표 결과는 득표 수 내림차순으로 조회된다")
     void getPollResultSortedByVoteCountDesc() throws Exception {
         Long pollId = createDemoDayPoll();
@@ -153,6 +157,7 @@ class VoteApiTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("존재하지 않는 투표 결과를 조회하면 예외가 발생한다")
     void getPollResultWithInvalidPollId() throws Exception {
         mockMvc.perform(get("/api/v1/polls/{pollId}/results", 999L))
@@ -163,6 +168,7 @@ class VoteApiTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("해당 투표에 속하지 않은 후보에게 투표하면 예외가 발생한다")
     void voteCandidateNotInPoll() throws Exception {
         String token = login();
@@ -189,6 +195,7 @@ class VoteApiTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("투표 목록을 조회할 수 있다")
     void getPolls() throws Exception {
         String token = login();
@@ -204,6 +211,7 @@ class VoteApiTest {
                 .andExpect(jsonPath("$.payload[0].voteType").value("DEMO_DAY"));
     }
 
+    @Transactional
     private Long createDemoDayPoll() throws Exception {
         String token = login();
 
@@ -245,6 +253,7 @@ class VoteApiTest {
         return jsonNode.path("payload").path("pollId").asLong();
     }
 
+    @Transactional
     private Long createPartLeaderPoll() throws Exception {
         String token = login();
 
@@ -281,6 +290,7 @@ class VoteApiTest {
         return jsonNode.path("payload").path("pollId").asLong();
     }
 
+    @Transactional
     private Candidate findCandidateByName(Long pollId, String name) {
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow();
@@ -293,6 +303,7 @@ class VoteApiTest {
                 .orElseThrow();
     }
 
+    @Transactional
     private void vote(Long pollId, Long candidateId) throws Exception {
         String token = login();
 
@@ -309,7 +320,7 @@ class VoteApiTest {
                 .andExpect(status().isOk());
     }
 
-
+    @Transactional
     @PostConstruct
     private void signup() throws Exception {
         if (memberRepository.existsByUserLogInId("ceos1234")) {
