@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
@@ -41,15 +40,8 @@ public class AuthControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @MockBean
+    @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
-
-    @SuppressWarnings("unchecked")
-    @BeforeEach
-    void setUpRedis() {
-        ValueOperations<Object, Object> valueOperations = mock(ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-    }
 
     @Test
     @Transactional
