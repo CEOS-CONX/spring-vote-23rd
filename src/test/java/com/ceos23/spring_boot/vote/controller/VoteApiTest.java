@@ -45,13 +45,6 @@ class VoteApiTest {
     @Autowired
     private CandidateRepository candidateRepository;
 
-    @BeforeEach
-    void setUp() {
-        candidateRepository.deleteAll();
-        pollRepository.deleteAll();
-    }
-
-    @PostConstruct
     @Transactional
     void signup() throws Exception {
         SignupRequest signupRequest = new SignupRequest(
@@ -63,6 +56,14 @@ class VoteApiTest {
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
+    }
+
+    @Transactional
+    @BeforeEach
+    void setUp() throws Exception {
+        candidateRepository.deleteAll();
+        pollRepository.deleteAll();
+        signup();
     }
 
     @Transactional
@@ -86,20 +87,20 @@ class VoteApiTest {
                   "voteType": "DEMO_DAY",
                   "candidates": [
                     {
-                      "name": "DiggIndie",
-                      "part": null,
-                      "team": "DIGG_INDIE"
-                    },
-                    {
-                      "name": "모델리",
-                      "part": null,
-                      "team": "MODELLI"
-                    },
-                    {
-                      "name": "캐치업",
-                      "part": null,
-                      "team": "CATCH_UP"
-                    }
+                       "name": "DiggIndie",
+                       "part": null,
+                       "team": "Ditda"
+                     },
+                     {
+                       "name": "모델리",
+                       "part": null,
+                       "team": "JobDri"
+                     },
+                     {
+                       "name": "캐치업",
+                       "part": null,
+                       "team": "Groupeat"
+                     }
                   ]
                 }
                 """;
@@ -216,20 +217,20 @@ class VoteApiTest {
                   "voteType": "DEMO_DAY",
                   "candidates": [
                     {
-                      "name": "DiggIndie",
-                      "part": null,
-                      "team": "DIGG_INDIE"
-                    },
-                    {
-                      "name": "모델리",
-                      "part": null,
-                      "team": "MODELLI"
-                    },
-                    {
-                      "name": "캐치업",
-                      "part": null,
-                      "team": "CATCH_UP"
-                    }
+                       "name": "DiggIndie",
+                       "part": null,
+                       "team": "Ditda"
+                     },
+                     {
+                       "name": "모델리",
+                       "part": null,
+                       "team": "JobDri"
+                     },
+                     {
+                       "name": "캐치업",
+                       "part": null,
+                       "team": "Groupeat"
+                     }
                   ]
                 }
                 """;
