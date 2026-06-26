@@ -206,9 +206,8 @@ class VoteApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("투표 목록 조회 성공"))
-                .andExpect(jsonPath("$.payload[0].pollId").value(pollId))
-                .andExpect(jsonPath("$.payload[0].title").value("23기 데모데이 투표"))
-                .andExpect(jsonPath("$.payload[0].voteType").value("DEMO_DAY"));
+                .andExpect(jsonPath("$.payload[?(@.pollId == " + pollId + ")].title").value("23기 데모데이 투표"))
+                .andExpect(jsonPath("$.payload[?(@.pollId == " + pollId + ")].voteType").value("DEMO_DAY"));
     }
 
     @Transactional
