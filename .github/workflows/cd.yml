@@ -59,10 +59,13 @@ jobs:
             script: |
               cd /home/ubuntu/spring-vote-23rd
               
-              cat > .env << EOF
+              cat > .env << 'EOF'
               IMAGE_TAG=${{ github.event.workflow_run.head_sha }}
               DB_URL=${{ secrets.DB_URL }}
-              DB_USERNAME=admin
+              
+              DB_USERNAME=vote
+              #실제 배포 시에는 admin으로 바꿔야합니다
+              
               DB_PASSWORD=${{ secrets.DB_PASSWORD }}
               JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
               SPRING_PROFILES_ACTIVE=test
