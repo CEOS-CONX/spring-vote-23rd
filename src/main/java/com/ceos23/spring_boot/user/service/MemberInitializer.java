@@ -25,8 +25,9 @@ public class MemberInitializer implements CommandLineRunner {
     }
 
     @Override
-    @PostConstruct
     public void run(String...args) {
+        if (memberRepository.count() > 0) return; // 이미 있으면 스킵
+
         String password = passwordEncoder.encode("1q2w3e4r**");
         List<String> feCandidateNames = List.of("박유민", "권오진", "이윤서", "구민교", "이승연", "황영준",
                 "남기림", "김민서", "김홍엽", "오유진");
