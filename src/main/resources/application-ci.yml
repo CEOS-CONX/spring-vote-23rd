@@ -3,3 +3,7 @@ spring:
     url: jdbc:mysql://localhost:3306/vote_test
     username: vote
     password: votepassword
+
+jwt:
+  secret:
+    key: bXlTdXBlclNlY3JldEtleUZvckpXVFRlc3RpbmdBbmRTcHJpbmdCb290M1NlY3VyaXR5

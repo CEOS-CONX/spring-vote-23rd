@@ -52,7 +52,7 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: ./gradlew test -Dspring.profiles.active=test,ci --stacktrace
-        
+
       - name: Debug - Print test XML
         if: failure()
         run: find . -path "*/test-results/test/*.xml" | xargs cat
