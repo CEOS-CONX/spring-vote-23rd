@@ -8,6 +8,8 @@ import com.ceos23.spring_boot.poll.service.PollService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
+import com.ceos23.spring_boot.poll.dto.PollListResponse;
+import java.util.List;
 
 @Tag(name = "Poll", description = "투표 생성 및 결과 조회 API")
 @RestController
@@ -32,5 +34,12 @@ public class PollController {
     public ApiResponse<PollResultResponse> getPollResult(@PathVariable Long pollId) {
         PollResultResponse response = pollService.getPollResult(pollId);
         return ApiResponse.ok("투표 결과 조회 성공", response);
+    }
+
+    @Operation(summary = "투표 목록 조회", description = "생성된 투표 목록을 조회합니다.")
+    @GetMapping
+    public ApiResponse<List<PollListResponse>> getPolls() {
+        List<PollListResponse> response = pollService.getPolls();
+        return ApiResponse.ok("투표 목록 조회 성공", response);
     }
 }
