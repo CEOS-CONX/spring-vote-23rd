@@ -87,6 +87,6 @@ class MemberControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andReturn()
-                .getRequest().getHeader("Authorization");
+                .getResponse().getHeader("Authorization");
     }
 }
