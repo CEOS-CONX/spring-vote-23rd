@@ -8,6 +8,7 @@ import com.ceos23.spring_boot.poll.repository.CandidateRepository;
 import com.ceos23.spring_boot.poll.repository.PollRepository;
 import com.ceos23.spring_boot.user.domain.Part;
 import com.ceos23.spring_boot.user.domain.Team;
+import com.ceos23.spring_boot.user.repository.MemberRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -44,6 +45,8 @@ class VoteApiTest {
 
     @Autowired
     private CandidateRepository candidateRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Transactional
     void signup() throws Exception {
@@ -63,6 +66,7 @@ class VoteApiTest {
     void setUp() throws Exception {
         candidateRepository.deleteAll();
         pollRepository.deleteAll();
+        memberRepository.deleteAll();
         signup();
     }
 
