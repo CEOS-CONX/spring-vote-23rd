@@ -25,7 +25,7 @@ public class MemberSetter {
 
     @PostConstruct
     public void setMember() {
-        String password = passwordEncoder.encode("1q2w3e4r**")
+        String password = passwordEncoder.encode("1q2w3e4r**");
         List<String> feCandidateNames = List.of("박유민", "권오진", "이윤서", "구민교", "이승연", "황영준",
                 "남기림", "김민서", "김홍엽", "오유진");
         List<String> beCandidateNames = List.of("임종훈", "안준석", "황신애", "최우혁", "김동욱", "최승원",
