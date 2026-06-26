@@ -5,6 +5,7 @@ import com.ceos23.spring_boot.user.domain.Part;
 import com.ceos23.spring_boot.user.domain.Team;
 import com.ceos23.spring_boot.user.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -14,17 +15,18 @@ import java.util.List;
 
 @Component
 @Profile("test")
-public class MemberSetter {
+public class MemberInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
 
-    public MemberSetter(PasswordEncoder passwordEncoder, MemberRepository memberRepository) {
+    public MemberInitializer(PasswordEncoder passwordEncoder, MemberRepository memberRepository) {
         this.passwordEncoder = passwordEncoder;
         this.memberRepository = memberRepository;
     }
 
+    @Override
     @PostConstruct
-    public void setMember() {
+    public void run(String...args) {
         String password = passwordEncoder.encode("1q2w3e4r**");
         List<String> feCandidateNames = List.of("박유민", "권오진", "이윤서", "구민교", "이승연", "황영준",
                 "남기림", "김민서", "김홍엽", "오유진");
