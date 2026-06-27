@@ -70,7 +70,8 @@ public class SecurityConfig {
 
                         //투표 결과보기
                         .requestMatchers(
-                                "/api/v1/polls/*/results"
+                                "/api/v1/polls/*/results",
+                                "/api/v1/members"
                         ).permitAll()
 
                         .anyRequest().authenticated()
