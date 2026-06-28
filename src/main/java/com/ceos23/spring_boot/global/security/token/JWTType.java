@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum JWTType {
-    ACCESS (3600),
+    ACCESS (3600 * 24),
     REFRESH (3600 * 24 * 3),
     TEMPORARY (60 * 5),
     TEST (1);
