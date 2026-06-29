@@ -82,7 +82,7 @@ public class SecurityConfig {
                 )
 
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
@@ -107,7 +107,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "https://www.conx.co.kr",
                 "https://conx.co.kr",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "https://next-vote-23rd-brown.vercel.app"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
