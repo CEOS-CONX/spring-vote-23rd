@@ -24,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
@@ -59,7 +58,7 @@ class VoteApiTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @MockBean
+    @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
     @SuppressWarnings("unchecked")
