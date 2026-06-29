@@ -30,6 +30,9 @@ public class Candidate extends BaseEntity {
     @Column(nullable = false)
     private int voteCount;
 
+    @Version
+    private int version;
+
     protected Candidate() {
     }
 

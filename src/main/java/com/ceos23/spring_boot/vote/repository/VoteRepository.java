@@ -4,6 +4,7 @@ import com.ceos23.spring_boot.poll.domain.Poll;
 import com.ceos23.spring_boot.user.domain.Member;
 import com.ceos23.spring_boot.vote.domain.Vote;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 
 import java.util.Optional;
 

@@ -14,6 +14,7 @@ import com.ceos23.spring_boot.vote.dto.VoteRequest;
 import com.ceos23.spring_boot.vote.dto.VoteResponse;
 import com.ceos23.spring_boot.vote.dto.VoteStatusResponse;
 import com.ceos23.spring_boot.vote.repository.VoteRepository;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,28 @@ public class VoteService {
 
     @Transactional
     public VoteResponse vote(Long pollId, VoteRequest request, Long memberId) {
+        int maxAttempts = 3;
+        int attempt = 0;
+
+        while (true) {
+            try {
+                return voteInternal(pollId, request, memberId);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (++attempt >= maxAttempts) {
+                    throw new CustomException(ErrorCode.ALREADY_VOTED);
+                }
+                try {
+                    Thread.sleep(50L * attempt);
+                }
+                catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    @Transactional
+    protected VoteResponse voteInternal(Long pollId, VoteRequest request, Long memberId) {
         Poll poll = getPoll(pollId);
         Member member = getMember(memberId);
         Candidate candidate = getCandidate(request.getCandidateId());
@@ -72,7 +95,28 @@ public class VoteService {
     }
 
     @Transactional
-    public VoteResponse revote(Long pollId, VoteRequest request, Long memberId) {
+    public VoteResponse revote(long pollId, VoteRequest request, Long memberId) {
+        int maxAttempts = 3;
+        int attempt = 0;
+
+        while (true) {
+            try {
+                return revoteInternal(pollId, request, memberId);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (++attempt >= maxAttempts) {
+                    throw new CustomException(ErrorCode.ALREADY_VOTED);
+                }
+                try {
+                    Thread.sleep(50L * attempt);
+                }
+                catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    private VoteResponse revoteInternal(Long pollId, VoteRequest request, Long memberId) {
         Poll poll = getPoll(pollId);
         Member member = getMember(memberId);
         Candidate newCandidate = getCandidate(request.getCandidateId());
@@ -98,6 +142,27 @@ public class VoteService {
 
     @Transactional
     public void cancelVote(Long pollId, Long memberId) {
+        int maxAttempts = 3;
+        int attempt = 0;
+
+        while (true) {
+            try {
+                cancelVoteInternal(pollId, memberId);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (++attempt >= maxAttempts) {
+                    throw new CustomException(ErrorCode.ALREADY_VOTED);
+                }
+                try {
+                    Thread.sleep(50L * attempt);
+                }
+                catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    private void cancelVoteInternal(Long pollId, Long memberId) {
         Poll poll = getPoll(pollId);
         Member member = getMember(memberId);
 

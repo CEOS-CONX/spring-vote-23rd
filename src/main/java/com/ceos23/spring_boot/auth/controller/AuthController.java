@@ -6,6 +6,7 @@ import com.ceos23.spring_boot.global.response.ApiResponse;
 import com.ceos23.spring_boot.global.security.token.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,5 +38,16 @@ public class AuthController {
         tokenProvider.setToken(response.accessToken(), response.refreshToken(), res);
 
         return ApiResponse.ok("로그인 성공", response.loginInfo());
+    }
+
+    @Operation(summary = "리프레시토큰 재발급", description = "리프레시토큰을 재발급합니다.")
+    @PostMapping("/refresh")
+    public ApiResponse<LoginResponseDTO> reIssueAccessToken(HttpServletRequest req,
+                                             HttpServletResponse res){
+        LoginServiceResponseDTO responseDTO = authService.reIssueToken(tokenProvider.getTokenFromCookie(req));
+        tokenProvider.setToken(responseDTO.accessToken(),
+                responseDTO.refreshToken(), res);
+
+        return ApiResponse.ok("리프레시토큰 재발급 성공", responseDTO.loginInfo());
     }
 }

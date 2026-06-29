@@ -15,7 +15,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -25,7 +27,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
     private final TokenProvider tokenProvider;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public SignupResponse signup(SignupRequest request) {
         if (memberRepository.existsByUserLogInId(request.userId())){
@@ -49,7 +51,7 @@ public class AuthService {
         String password = request.password();
 
         Member member = memberRepository.findByUserLogInId(userLoginId).orElseThrow(
-                () -> new CustomException(ErrorCode.UNAUTHORIZED)
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
         if (!encoder.matches(password, member.getPassword())){
@@ -74,5 +76,44 @@ public class AuthService {
         LoginResponseDTO info = LoginResponseDTO.create(member);
 
         return LoginServiceResponseDTO.of(accessToken, refreshToken, info);
+    }
+
+    //리프레시 토큰
+    @Transactional(readOnly = true)
+    public LoginServiceResponseDTO reIssueToken(String refreshToken){
+        long userId = tokenProvider.getIdFromToken(refreshToken);
+        Member member = memberRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        String refreshTokenInRedis = redisTemplate.opsForValue().get(
+                "refreshToken:" + userId
+        );
+
+        if (refreshTokenInRedis == null){
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+        }
+
+        if (!refreshToken.equals(refreshTokenInRedis)){
+            redisTemplate.delete("refreshToken:" + userId);
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_REUSED);
+        }
+
+        CustomUserDetails userDetails = CustomUserDetails.of(member);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+        );
+
+        String accessToken = tokenProvider.createToken(userDetails.getId(), authentication, JWTType.ACCESS);
+        String newRefreshToken = tokenProvider.createToken(userDetails.getId(), authentication, JWTType.REFRESH);
+
+        redisTemplate.opsForValue().set(
+                "refreshToken:" + member.getId(),
+                newRefreshToken,
+                JWTType.REFRESH.getValidTime(),
+                TimeUnit.SECONDS
+        );
+
+        return LoginServiceResponseDTO.of(accessToken, newRefreshToken, LoginResponseDTO.create(member));
     }
 }
